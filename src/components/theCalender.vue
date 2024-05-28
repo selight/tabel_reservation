@@ -15,7 +15,8 @@
             'day-content',
             { 'd-none': !day.date },
             { outside: day.outside },
-            { 'disabled-day': isDisabledDay(day.date) || isPastDay(day.date) },
+            { 'disabled-day': isDisabledDay(day.date) || isPastDay(day.date)},
+            { 'selected-day': isSelectedDay(day.date)},
           ]"
           @click="
             !isDisabledDay(day.date) &&
@@ -74,6 +75,7 @@ export default {
         "Dicembre",
       ],
       weekDays: ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
+      selectedDate: null,
     };
   },
   created() {
@@ -173,8 +175,12 @@ export default {
       today.setHours(0, 0, 0, 0);
       return date < today;
     },
+    isSelectedDay(date) {
+      return date?.getTime() === this.selectedDate?.getTime();
+    },
     handleDayClick(date) {
       if (!this.isPastDay(date) && !this.isDisabledDay(date)) {
+        this.selectedDate = date;
         this.onDayClick(date);
       }
     },
@@ -281,5 +287,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.selected-day {
+  box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
+  font-weight: 500;
+  background-color: rgb(238, 246, 245);
 }
 </style>

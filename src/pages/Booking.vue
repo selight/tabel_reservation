@@ -8,7 +8,7 @@
       src="../assets/tamashiBookingImage.jpg"
     ></v-img>
 
-      <div  class="text-center font-weight-bold  text-h5">Tamasshi Restorant</div>
+      <div  class="text-center font-weight-bold  text-h5">Tamashi Ramen</div>
       <v-divider></v-divider>
 
       <v-stepper v-model="step" class="my-4" dense>
@@ -74,9 +74,9 @@
             <v-row>
               <v-col cols="12" class="mb-2">
                 <h3 class="mb-3">Pranzo</h3>
-                <v-row>
+                <v-row class="justify-sm-start justify-space-around">
                   <v-col v-for="time in lunchTimes" :key="time.time" cols="auto">
-                    <v-btn large  class="position-relative" outlined @click="selectTime(time)">
+                    <v-btn large :class="{'selected': isSelectedTime(time.time)}"  class="position-relative" outlined @click="selectTime(time)">
                       <span class="px-4">{{ time.time }}</span>
                       <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
                     </v-btn>
@@ -89,10 +89,10 @@
             <v-row>
               <v-col cols="12" class="mb-2 ">
                 <h3 class="mb-3">Cena</h3>
-                <v-row>
+                <v-row class="justify-sm-start justify-space-around">
                   <v-col v-for="time in dinnerTimes" :key="time.time" cols="auto">
-                    <v-btn large  class="position-relative" outlined @click="selectTime(time)">
-                      <span class="px-4">{{ time.time }}</span>
+                    <v-btn large :class="{'selected': isSelectedTime(time.time)}"  class="position-relative" outlined @click="selectTime(time)">
+                      <span class=" px-4">{{ time.time }}</span>
                       <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
                     </v-btn>
                   </v-col>
@@ -113,20 +113,20 @@
               </v-col>
             </v-row>
             <v-divider class="ma-3"></v-divider>
-            <v-row>
+            <v-row class="justify-center justify-sm-start">
               <v-col cols="auto" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
-                <v-btn large  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
+                <v-btn large :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
               </v-col>
             </v-row>
             <v-divider class="ma-3"></v-divider>
             <v-row>
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
                 <v-icon left class="mr-2">mdi-account-outline</v-icon>
-                <h3 class="my-0">Numero di seggiolini</h3>
+                <h3 class="my-0">Numero di bambni</h3>
               </v-col>
             </v-row>
             <v-divider class="ma-3"></v-divider>
-            <v-row>
+            <v-row class="justify-center justify-sm-start">
               <v-col col="12" v-for="(number,index) in [1,2,3,4]" :key="index" class="text-center">
                 <v-btn large outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
               </v-col>
@@ -226,10 +226,18 @@ export default {
     },
     selectTime(time) {
       this.steps[1].value = time.time;
+      this.selectedTime = time.time;
       this.completeStep(2);
       this.goToStep(3);
     },
+    isSelectedTime(time) {
+      return this.selectedTime === time;
+    },
+    isSelectedNumberOfPersons(number) {
+      return this.selectedNumberOfPersons === number;
+    },
     selectNumberOfPersons(number) {
+      this.selectedNumberOfPersons = number;
       this.steps[2].value = number + ' persone';
       this.completeStep(3);
       this.goToStep(4);
@@ -378,5 +386,10 @@ v-icon {
 
 .status-non-disponible {
   background-color: gray;
+}
+.selected {
+  box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
+  font-weight: 600;
+  background-color: rgb(238, 246, 245);
 }
 </style>
