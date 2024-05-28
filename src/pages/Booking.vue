@@ -166,8 +166,6 @@ export default {
       maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().substr(0, 10),
       lunchTimes: [{time: '12:00',status:'Disponible'}, {time: '12:30',status: 'Posti Esauriti'}, {time: '13:00', status: "Lista d'attesa"}, {time: '13:30', status: 'Non Disponible'}, {time: '14:00',status: 'Non Disponible'}, {time: '14:30',status: 'Disponible'}],
       dinnerTimes: [{time: '19:00', status: "Lista d'attesa"}, {time: '19:30', status: 'Non Disponible'}, {time: '20:00',status: 'Non Disponible'}, {time: '20:30',status: 'Disponible'}, {time: '21:00',status: 'Disponible'}, {time: '21:30',status: 'Disponible'}],
-      selectedTime: null,
-      selectedNumberOfPersons: null,
       numberOfPersons: Array.from({length: 12}, (_, i) => i + 1),
       steps: [
         {step: 1, icon: 'mdi-calendar-month-outline', label: 'Data', value: ''},
@@ -204,6 +202,7 @@ export default {
       this.steps.forEach((stepItem) => {
         if (stepItem.step > step) {
           stepItem.value = null;
+          this.completedSteps.delete(stepItem.step);
         }
       });
     },
@@ -238,18 +237,16 @@ export default {
     },
     selectTime(time) {
       this.steps[1].value = time.time;
-      this.selectedTime = time.time;
       this.completeStep(2);
       this.goToStep(3);
     },
     isSelectedTime(time) {
-      return this.selectedTime === time;
+      return this.steps[1].value === time;
     },
     isSelectedNumberOfPersons(number) {
-      return this.selectedNumberOfPersons === number;
+      return this.steps[2].value === number;
     },
     selectNumberOfPersons(number) {
-      this.selectedNumberOfPersons = number;
       this.steps[2].value = number + ' persone';
       this.completeStep(3);
       this.goToStep(4);
