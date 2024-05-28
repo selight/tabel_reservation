@@ -1,4 +1,4 @@
-# tabel_reservation
+# table_reservation
 
 ## Project setup
 ```

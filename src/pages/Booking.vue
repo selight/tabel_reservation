@@ -1,16 +1,16 @@
 <template>
   <v-container class="pa-2 ">
-    <v-card flat>
+    <v-card flat max-width="600px">
       <v-img
       height="200px"
       cover
       position="top"
       src="../assets/tamashiBookingImage.jpg"
     ></v-img>
- 
+
       <div  class="text-center font-weight-bold  text-h5">Tamasshi Restorant</div>
       <v-divider></v-divider>
-     
+
       <v-stepper v-model="step" class="my-4" dense>
         <v-stepper-header dense>
           <div v-for="(stepItem, index) in steps " :key="index">
@@ -22,7 +22,7 @@
                 :editable="step > stepItem.step"
                 @click="goToStep(stepItem.step)"
             >
-              <v-icon left :color="step >= stepItem.step ? 'white' : ''" size="small">{{ stepItem.icon }}</v-icon>
+              <v-icon left v-if="!stepItem.value" :color="step >= stepItem.step ? 'white' : ''" size="small">{{ stepItem.icon }}</v-icon>
               <span v-if="!stepItem.value && step === stepItem.step">{{ stepItem.label }}</span>
               <span v-else>{{ stepItem.value }}</span>
 
@@ -30,7 +30,7 @@
 
           </div>
         </v-stepper-header>
-       
+
         <v-stepper-items>
           <v-stepper-content step="1">
             <v-row>
@@ -38,9 +38,9 @@
                 <the-calender :on-day-click="onDateChange"
                               :show-outside-days="false"
                               :eventDays="[
-                                  { date: '2024/05/27', promotionText: '50%' },
+                                  { date: '2024/05/29', promotionText: '50%' },
                                   { date: '2024/05/28', promotionText: '20%' },
-                                  { date: '2024/05/30', promotionText: 'ibook' },
+                                  { date: '2024/05/30', promotionText: '30%' },
                                   { date: '2024/05/31', promotionText: 'Sale' }
   ]"
                               :disabled-days="['30/05/2024']"/>
@@ -51,8 +51,9 @@
           <v-stepper-content step="2">
             <!-- Content for Step 2 -->
             <v-row>
-              <v-col cols="12" class="pb-2 text-center ">
-                <h3>Scegli la sala</h3>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-map-marker</v-icon>
+                <h3 class="my-0">Scegli la sala</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -63,32 +64,39 @@
             </v-row>
             <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col cols="12" class="pb-2 text-center ">
-                <h3>Scegli l'orario</h3>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-clock-outline</v-icon>
+                <h3 class="my-0">Scegli l'orario</h3>
               </v-col>
             </v-row>
             <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col cols="12" class="pb-2 ">
-                <h3>Pranzo</h3>
-                <v-btn large class=" ma-2 position-relative" outlined v-for="time in lunchTimes" :key="time"
-                       @click="selectTime(time)">
+              <v-col cols="12" class="mb-2">
+                <h3 class="mb-3">Pranzo</h3>
+                <v-row>
+                  <v-col v-for="time in lunchTimes" :key="time.time" cols="auto">
+                    <v-btn large  class="position-relative" outlined @click="selectTime(time)">
+                      <span class="px-4">{{ time.time }}</span>
+                      <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
+                    </v-btn>
+                  </v-col>
+                </v-row>
 
-                  <span class="px-6">{{ time }}</span>
-                  <div class="time-label">Disponible</div>
-
-                </v-btn>
               </v-col>
             </v-row>
-
+             <v-divider class="my-3"></v-divider>
             <v-row>
-              <v-col cols="12" class=" pt-2 ">
-                <h3>Cena</h3>
-                <v-btn large class=" ma-2 position-relative " outlined v-for="time in dinnerTimes" :key="time"
-                       @click="selectTime(time)">
-                  <span class="px-6 ">{{ time }}</span>
-                  <div class="time-label">Disponible</div>
-                </v-btn>
+              <v-col cols="12" class="mb-2 ">
+                <h3 class="mb-3">Cena</h3>
+                <v-row>
+                  <v-col v-for="time in dinnerTimes" :key="time.time" cols="auto">
+                    <v-btn large  class="position-relative" outlined @click="selectTime(time)">
+                      <span class="px-4">{{ time.time }}</span>
+                      <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+
               </v-col>
             </v-row>
 
@@ -96,22 +104,30 @@
 
           <v-stepper-content step="3">
             <!-- Content for Step 3 -->
+            <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col cols="12" class="pb-2 text-center">
-                <h3>Numero di persone</h3>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-account-outline</v-icon>
+                <h3 class="my-0">Numero di Persone</h3>
               </v-col>
             </v-row>
+            <v-divider class="ma-3"></v-divider>
             <v-row>
               <v-col cols="3" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
-                <v-btn class="mx-2 my-1 btn-large" outlined @click="selectNumberOfPersons(number)">{{ number }}</v-btn>
+                <v-btn large  outlined @click="selectNumberOfPersons(number)"><span class="px-6 ">{{ number }}</span></v-btn>
               </v-col>
             </v-row>
+            <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col cols="12" class="pa-2 text-center">
-                <h4>Children requiring high chair?</h4>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-account-outline</v-icon>
+                <h3 class="my-0">Numero di seggiolini</h3>
               </v-col>
-              <v-col col="12" v-for="(number,index) in [1,2,3,4]" :key="index" class="text-center">
-                <v-btn class="mx-2 my-1 btn-large" outlined @click="selectNumberOfPersons(number)">{{ number }}</v-btn>
+            </v-row>
+            <v-divider class="ma-3"></v-divider>
+            <v-row>
+              <v-col col="12" v-for="(number,index) in [1,2,3,4]" :key="index" class="text-center a">
+                <v-btn large outlined @click="selectNumberOfPersons(number)"><span class="px-6 ">{{ number }}</span></v-btn>
               </v-col>
             </v-row>
           </v-stepper-content>
@@ -133,7 +149,12 @@
 <script>
 import informationTabsComponent from "../components/informationTabsComponent.vue";
 import theCalender from "../components/theCalender.vue";
-
+const TimeStatus = {
+  DISPONIBLE: 'Disponible',
+  POSTI_ESAURITI: 'Posti Esauriti',
+  LISTA_D_ATTESA: "Lista d'attesa",
+  NON_DISPONIBLE: 'Non Disponible'
+};
 export default {
   name: 'BookingPage',
   data() {
@@ -142,8 +163,8 @@ export default {
       selectedDate: null,
       minDate: new Date().toISOString().substr(0, 10),
       maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().substr(0, 10),
-      lunchTimes: [],
-      dinnerTimes: [],
+      lunchTimes: [{time: '12:00',status:'Disponible'}, {time: '12:30',status: 'Posti Esauriti'}, {time: '13:00', status: "Lista d'attesa"}, {time: '13:30', status: 'Non Disponible'}, {time: '14:00',status: 'Non Disponible'}, {time: '14:30',status: 'Disponible'}],
+      dinnerTimes: [{time: '19:00', status: "Lista d'attesa"}, {time: '19:30', status: 'Non Disponible'}, {time: '20:00',status: 'Non Disponible'}, {time: '20:30',status: 'Disponible'}, {time: '21:00',status: 'Disponible'}, {time: '21:30',status: 'Disponible'}],
       selectedTime: null,
       selectedNumberOfPersons: null,
       numberOfPersons: Array.from({length: 12}, (_, i) => i + 1),
@@ -185,39 +206,30 @@ export default {
         month: 'short',
       });
       this.steps[0].value = date;
-      this.generateTimeSlots();
       this.completeStep(1)
       this.goToStep(2)
     },
-    generateTimeSlots() {
-      // Clear previous time slots
-      this.lunchTimes = [];
-      this.dinnerTimes = [];
-
-      // Generate lunch time slots (12:00 PM - 3:00 PM)
-      for (let hour = 12; hour < 15; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-          this.lunchTimes.push(time);
-        }
+    getStatusClass(status) {
+      switch (status) {
+        case TimeStatus.DISPONIBLE:
+          return 'status-disponible';
+        case TimeStatus.POSTI_ESAURITI:
+          return 'status-posti-esauriti';
+        case TimeStatus.LISTA_D_ATTESA:
+          return 'status-lista-d-attesa';
+        case TimeStatus.NON_DISPONIBLE:
+          return 'status-non-disponible';
+        default:
+          return '';
       }
-
-      // Generate dinner time slots (6:00 PM - 9:00 PM)
-      for (let hour = 18; hour < 21; hour++) {
-        for (let minute = 0; minute < 60; minute += 30) {
-          const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-          this.dinnerTimes.push(time);
-        }
-      }
-      this.step = 2
     },
     selectTime(time) {
-      this.steps[1].value = time;
+      this.steps[1].value = time.time;
       this.completeStep(2);
       this.goToStep(3);
     },
     selectNumberOfPersons(number) {
-      this.steps[2].value = number;
+      this.steps[2].value = number + ' persone';
       this.completeStep(3);
       this.goToStep(4);
     }
@@ -343,8 +355,22 @@ v-icon {
   padding: 2px 6px;
   font-size: 10px;
   text-transform: none;
-  background-color: green;
+  background-color: gray;
   font-weight: bold;
 }
+.status-disponible {
+  background-color: green;
+}
 
+.status-posti-esauriti {
+  background-color: gray;
+}
+
+.status-lista-d-attesa {
+  background-color: orange;
+}
+
+.status-non-disponible {
+  background-color: gray;
+}
 </style>
