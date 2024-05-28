@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-2 ">
+  <v-container>
     <v-card flat max-width="600px">
       <v-img
       height="200px"
@@ -32,6 +32,7 @@
         </v-stepper-header>
 
         <v-stepper-items>
+          <v-divider class="my-1"></v-divider>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
@@ -113,8 +114,8 @@
             </v-row>
             <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col cols="3" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
-                <v-btn large  outlined @click="selectNumberOfPersons(number)"><span class="px-6 ">{{ number }}</span></v-btn>
+              <v-col cols="auto" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
+                <v-btn large  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
               </v-col>
             </v-row>
             <v-divider class="ma-3"></v-divider>
@@ -126,8 +127,8 @@
             </v-row>
             <v-divider class="ma-3"></v-divider>
             <v-row>
-              <v-col col="12" v-for="(number,index) in [1,2,3,4]" :key="index" class="text-center a">
-                <v-btn large outlined @click="selectNumberOfPersons(number)"><span class="px-6 ">{{ number }}</span></v-btn>
+              <v-col col="12" v-for="(number,index) in [1,2,3,4]" :key="index" class="text-center">
+                <v-btn large outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
               </v-col>
             </v-row>
           </v-stepper-content>
@@ -201,7 +202,7 @@ export default {
     onDateChange(date) {
 
       // format the date to show the date number and month name shortned
-      date = new Date(date).toLocaleDateString('en-GB', {
+      date = new Date(date).toLocaleDateString('it-IT', {
         day: 'numeric',
         month: 'short',
       });
@@ -241,11 +242,15 @@ export default {
 .text-center {
   text-align: center;
 }
-
+div ::v-deep .v-stepper {
+   box-shadow: none !important;
+}
 div ::v-deep .v-stepper__step__step {
   display: none !important;
 }
-
+div ::v-deep .v-stepper__content {
+  padding: 0 !important;
+}
 @media only screen and (max-width: 959.98px) {
   div ::v-deep .v-stepper:not(.v-stepper--vertical) .v-stepper__label {
     display: block !important;
@@ -269,6 +274,7 @@ div ::v-deep .v-stepper__header {
   flex: 1 1 0;
   align-items: center;
   height: auto !important;
+  box-shadow: none;
 }
 
 .step {

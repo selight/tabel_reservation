@@ -126,7 +126,7 @@ export default {
       if (date === null) {
         return false;
       }
-      const formattedDate = date.toLocaleDateString("en-GB");
+      const formattedDate = date.toLocaleDateString("it-IT");
       return this.eventDays.some((event) => {
         const formattedEventDate = new Date(event.date).toLocaleDateString(
           "en-GB"
@@ -138,17 +138,17 @@ export default {
       if (date === null) {
         return false;
       }
-      const formattedDate = date.toLocaleDateString("en-GB");
+      const formattedDate = date.toLocaleDateString("it-IT");
       const event = this.eventDays.find((event) => {
         const formattedEventDate = new Date(event.date).toLocaleDateString(
-          "en-GB"
+          "it-IT"
         );
         return formattedEventDate === formattedDate;
       });
       return event ? event.promotionText : "";
     },
     isDisabledDay(date) {
-      return this.disabledDays.includes(date?.toLocaleDateString("en-GB"));
+      return this.disabledDays.includes(date?.toLocaleDateString("it-IT"));
     },
     nextMonth() {
       if (this.currentMonth === 11) {
@@ -226,7 +226,8 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  min-width: 44px;
+  width: 44px;
+  min-width: 30px;
   aspect-ratio: 1;
   box-shadow: rgb(213, 216, 220) 0 0 0 1px inset;
   border-radius: 4px;
