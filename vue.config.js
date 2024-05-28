@@ -4,3 +4,6 @@ module.exports = defineConfig({
     'vuetify'
   ]
 })
+module.exports = {
+  publicPath: process.env.NODE_ENV === "production" ? "/table_reservation/" : "/",
+};
