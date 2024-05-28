@@ -9,9 +9,9 @@
     ></v-img>
 
       <div  class="text-center font-weight-bold  text-h5">Tamashi Ramen</div>
-      <v-divider></v-divider>
+      <v-divider class="my-2"></v-divider>
 
-      <v-stepper v-model="step" class="my-4" dense>
+      <v-stepper v-model="step" dense>
         <v-stepper-header dense>
           <div v-for="(stepItem, index) in steps " :key="index">
             <v-stepper-step
@@ -32,7 +32,7 @@
         </v-stepper-header>
 
         <v-stepper-items>
-          <v-divider class="my-1"></v-divider>
+          <v-divider class="my-2"></v-divider>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
@@ -301,24 +301,31 @@ div ::v-deep .v-stepper__header {
   padding: 0.6rem;
   font-size: 13px;
   color: white;
-
+  line-height: 13px;
 }
 
 .step.active::after {
-  content: '';
+  content: "";
   position: absolute;
-  right: -20px; /* Adjust according to the arrow size */
-  width: 0;
-  height: 0;
-  border-top: 25px solid transparent;
-  border-bottom: 25px solid transparent;
-  border-left: 20px solid black; /* Same color as the button */
+  width: 25px;
+  height: 25px;
+  border-radius: 0.125rem;
   z-index: 1;
+  transform: rotate(45deg);
+  background-color: #000000;
+  transform-origin: right top;
+  right: calc(-1.075rem);
+  top: 50%;
 }
 
 .step.active {
   background-color: black !important;
   color: white;
+}
+.step.active span {
+  position: relative;
+  z-index: 2;
+  font-size: 13px;
 }
 
 div ::v-deep .v-stepper__step--active {
