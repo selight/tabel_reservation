@@ -22,7 +22,7 @@
                 :editable="step > stepItem.step"
                 @click="goToStep(stepItem.step)"
             >
-              <v-icon left v-if="!stepItem.value" :color="step >= stepItem.step ? 'white' : ''" size="small">{{ stepItem.icon }}</v-icon>
+              <v-icon left v-if="!stepItem.value" :color="step >= stepItem.step ? 'white' : ''" size="12px">{{ stepItem.icon }}</v-icon>
               <span v-if="!stepItem.value && step === stepItem.step">{{ stepItem.label }}</span>
               <span v-else>{{ stepItem.value }}</span>
 
@@ -262,7 +262,10 @@ export default {
 div ::v-deep .v-stepper {
    box-shadow: none !important;
 }
-div ::v-deep .v-stepper__step__step {
+div ::v-deep .v-stepper__step__step{
+  display: none !important;
+}
+div ::v-deep .v-stepper__header .v-ripple__container {
   display: none !important;
 }
 div ::v-deep .v-stepper__content {
