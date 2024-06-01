@@ -36,20 +36,51 @@
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
-                <the-calender :on-day-click="onDateChange"
+                <the-calender
+                    v-if="enabledDays.length>0"
+                    :on-day-click="onDateChange"
                               :show-outside-days="false"
                               :eventDays="[
                                   { date: '2024/05/29', promotionText: '50%' },
                                   { date: '2024/05/28', promotionText: '20%' },
                                   { date: '2024/05/30', promotionText: '30%' },
                                   { date: '2024/05/31', promotionText: 'Sale' }
-  ]"
+                                  ]"
+                              :enabled-days="enabledDays"
                               :disabled-days="['30/05/2024']"/>
               </v-col>
             </v-row>
           </v-stepper-content>
-
           <v-stepper-content step="2">
+            <!-- Content for Step 3 -->
+            <v-divider class="my-3"></v-divider>
+            <v-row>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-account-outline</v-icon>
+                <h3 class="my-0">Numero di Persone</h3>
+              </v-col>
+            </v-row>
+            <v-divider class="my-3"></v-divider>
+            <v-row class="justify-center justify-sm-start">
+              <v-col cols="3" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
+                <v-btn  :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+              </v-col>
+            </v-row>
+            <v-divider class="my-3"></v-divider>
+            <v-row>
+              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                <v-icon left class="mr-2">mdi-account-outline</v-icon>
+                <h3 class="my-0">Numero di bambni</h3>
+              </v-col>
+            </v-row>
+            <v-divider class="my-3"></v-divider>
+            <v-row class="justify-center justify-sm-start">
+              <v-col cols="3" v-for="(number, index) in numberOfChildren" :key="index" class="text-center">
+                <v-btn  :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+              </v-col>
+            </v-row>
+          </v-stepper-content>
+          <v-stepper-content step="3">
             <!-- Content for Step 2 -->
             <v-row>
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
@@ -71,7 +102,7 @@
               </v-col>
             </v-row>
             <v-divider class="my-3"></v-divider>
-            <v-row>
+            <v-row v-if="lunchTimes.length">
               <v-col cols="12" class="mb-2">
                 <h3 class="mb-3">Pranzo</h3>
                 <v-row class="justify-sm-start justify-space-around">
@@ -86,7 +117,7 @@
               </v-col>
             </v-row>
              <v-divider class="my-3"></v-divider>
-            <v-row>
+            <v-row v-if="dinnerTimes.length">
               <v-col cols="12" class="mb-2 ">
                 <h3 class="mb-3">Cena</h3>
                 <v-row class="justify-sm-start justify-space-around">
@@ -103,35 +134,7 @@
 
           </v-stepper-content>
 
-          <v-stepper-content step="3">
-            <!-- Content for Step 3 -->
-            <v-divider class="my-3"></v-divider>
-            <v-row>
-              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
-                <v-icon left class="mr-2">mdi-account-outline</v-icon>
-                <h3 class="my-0">Numero di Persone</h3>
-              </v-col>
-            </v-row>
-            <v-divider class="my-3"></v-divider>
-            <v-row class="justify-center justify-sm-start">
-              <v-col cols="auto" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
-                <v-btn large :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
-              </v-col>
-            </v-row>
-            <v-divider class="my-3"></v-divider>
-            <v-row>
-              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
-                <v-icon left class="mr-2">mdi-account-outline</v-icon>
-                <h3 class="my-0">Numero di bambni</h3>
-              </v-col>
-            </v-row>
-            <v-divider class="my-3"></v-divider>
-            <v-row class="justify-center justify-sm-start">
-              <v-col col="auto" v-for="(number,index) in [1,2,3,4,5]" :key="index" class="text-center">
-                <v-btn large outlined @click="selectNumberOfPersons(number)"><span class="px-sm-6 ">{{ number }}</span></v-btn>
-              </v-col>
-            </v-row>
-          </v-stepper-content>
+
           <v-stepper-content step="4">
             <!--            Content for step 4-->
             <information-tabs-component/>
@@ -150,6 +153,9 @@
 <script>
 import informationTabsComponent from "../components/informationTabsComponent.vue";
 import theCalender from "../components/theCalender.vue";
+import authService from '../service/authService';
+
+
 const TimeStatus = {
   DISPONIBLE: 'Disponible',
   POSTI_ESAURITI: 'Posti Esauriti',
@@ -164,16 +170,29 @@ export default {
       selectedDate: null,
       minDate: new Date().toISOString().substr(0, 10),
       maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().substr(0, 10),
-      lunchTimes: [{time: '12:00',status:'Disponible'}, {time: '12:30',status: 'Posti Esauriti'}, {time: '13:00', status: "Lista d'attesa"}, {time: '13:30', status: 'Non Disponible'}, {time: '14:00',status: 'Non Disponible'}, {time: '14:30',status: 'Disponible'}],
-      dinnerTimes: [{time: '19:00', status: "Lista d'attesa"}, {time: '19:30', status: 'Non Disponible'}, {time: '20:00',status: 'Non Disponible'}, {time: '20:30',status: 'Disponible'}, {time: '21:00',status: 'Disponible'}, {time: '21:30',status: 'Disponible'}],
-      numberOfPersons: Array.from({length: 12}, (_, i) => i + 1),
+      lunchTimes: [],
+      dinnerTimes: [],
+      numberOfPersons: Array.from({length: 16}, (_, i) => i + 1),
+      numberOfChildren: Array.from({length: 4}, (_, i) => i + 1),
       steps: [
         {step: 1, icon: 'mdi-calendar-month-outline', label: 'Data', value: ''},
-        {step: 2, icon: 'mdi-clock-outline', label: 'Orario', value: ''},
-        {step: 3, icon: 'mdi-account-outline', label: 'Persone', value: ''},
+        {step: 2, icon: 'mdi-account-outline', label: 'Persone', value: ''},
+        {step: 3, icon: 'mdi-clock-outline', label: 'Orario', value: ''},
         {step: 4, icon: 'mdi-information-outline', label: 'Dati Prenotazione', value: ''},
       ],
       completedSteps:new Set(),
+      bookingId:'',
+      booking: {
+        date: null,
+        mealId: null,
+        optIn: false,
+        newsletter: false,
+        gender: null,
+        birthdate: null
+      },
+      locations: null,
+      bookableDays: [],
+      enabledDays: [],
     };
   },
   watch: {
@@ -210,8 +229,24 @@ export default {
       console.log('Form submitted');
       // Handle form submission logic
     },
+    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes,status) {
+      return Array.from({ length: slotCount }, (_, i) => {
+        const time = new Date(2024, 5, 1, startHour, startMinute);
+        time.setMinutes(time.getMinutes() + i * intervalMinutes);
+        return {
+          time: time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+          status: status || TimeStatus.DISPONIBLE,
+        };
+      });
+    },
     onDateChange(date) {
-
+      const selectedDay = this.bookableDays.find((day) => day.date === date.toLocaleDateString('it-IT'));
+      if(selectedDay.isLUNCH_OPEN){
+        this.lunchTimes= this.generateTimeSlots(12, 0, 6, 30);
+      }
+      if(selectedDay.isDINNER_OPEN){
+        this.dinnerTimes= this.generateTimeSlots(19, 0, 6, 30);
+      }
       // format the date to show the date number and month name shortned
       date = new Date(date).toLocaleDateString('it-IT', {
         day: 'numeric',
@@ -236,22 +271,53 @@ export default {
       }
     },
     selectTime(time) {
-      this.steps[1].value = time.time;
-      this.completeStep(2);
+      this.steps[2].value = time.time;
+      this.completeStep(3);
       this.goToStep(3);
     },
     isSelectedTime(time) {
       return this.steps[1].value === time;
     },
     isSelectedNumberOfPersons(number) {
-      return this.steps[2].value === number;
+      return this.steps[2].value === number + ' persone';
     },
     selectNumberOfPersons(number) {
-      this.steps[2].value = number + ' persone';
-      this.completeStep(3);
+      this.steps[1].value = number + ' persone';
+      this.completeStep(2);
       this.goToStep(4);
+    },
+    updateEnabledDays() {
+      this.enabledDays = this.bookableDays.map((day) => day.date);
+    },
+    async authenticate() {
+      const { result, error } = await authService.authenticate(this.bookingId);
+
+      if (error) {
+        console.log(error)
+       return error
+      } else {
+        const {  locations, bookableDays} = result;
+        return { locations, bookableDays };
+      }
     }
   },
+  async created() {
+    const {bookableDays, locations} = await this.authenticate()
+    this.bookableDays = bookableDays.map((day) => {
+      if (day.isDAY_OPEN) {
+        {
+          return {
+            date: new Date(day.date).toLocaleDateString('it-It'),
+            isDINNER_OPEN: false,
+            isLUNCH_OPEN: day.isLUNCH_OPEN,
+          }
+        }
+      }
+    });
+    this.locations = locations;
+    this.updateEnabledDays();
+  }
+
 };
 </script>
 

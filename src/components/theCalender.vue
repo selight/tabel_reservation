@@ -15,7 +15,7 @@
             'day-content',
             { 'd-none': !day.date },
             { outside: day.outside },
-            { 'disabled-day': isDisabledDay(day.date) || isPastDay(day.date)},
+            { 'disabled-day': isDisabledDay(day.date)  || isPastDay(day.date) ||!day.enabled },
             { 'selected-day': isSelectedDay(day.date)},
           ]"
           @click="
@@ -54,12 +54,17 @@ export default {
       type: Array,
       default: () => [],
     },
+    enabledDays:{
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth(),
       days: [],
+      automaticallyDisabledDays: [],
       monthNames: [
         "Gennaio",
         "Febbraio",
@@ -85,6 +90,9 @@ export default {
     updateDays() {
       this.days = this.generateDays(this.currentYear, this.currentMonth);
     },
+    isDateEnabled(date){
+      return  this.enabledDays.length ? this.enabledDays.includes(date?.toLocaleDateString("it-IT")) : true;
+    },
     generateDays(year, month) {
       const days = [];
       const firstDay = new Date(year, month, 1);
@@ -105,7 +113,7 @@ export default {
 
       // Add days of the current month
       for (let i = 1; i <= numDays; i++) {
-        days.push({ date: new Date(year, month, i), outside: false });
+        days.push({ date: new Date(year, month, i), outside: false, enabled: this.isDateEnabled(new Date(year, month, i)) });
       }
 
       // Add days of the next month to fill remaining rows
