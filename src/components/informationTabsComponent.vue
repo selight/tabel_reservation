@@ -1,18 +1,21 @@
 <template>
   <v-card flat>
-    <v-tabs v-model="tab">
+    <v-tabs v-model="tab" align-tabs="start" color="black">
       <v-tab>Dati</v-tab>
       <v-tab>FAQ</v-tab>
       <v-tab>Parking</v-tab>
-      <v-tab>Navigazione</v-tab>
+      <v-tab>Naviga</v-tab>
 
       <!-- Tab items -->
       <v-tab-item>
         <!-- Dati Content -->
         <v-form @submit.prevent="submitForm">
-          <v-text-field label="Nome" v-model="userDetails.nome" required></v-text-field>
+          <v-text-field label="Nome e Cognome" v-model="userDetails.nome" required></v-text-field>
           <v-text-field label="Email" v-model="userDetails.email" required></v-text-field>
+          <div>
           <v-text-field label="Telefono" v-model="userDetails.telefono" required></v-text-field>
+            <v-text-field label="CAP Rezisdenza" v-model="userDetails.cap" required></v-text-field>
+          </div>
         </v-form>
         <v-row>
           <v-col cols="6">
@@ -93,3 +96,13 @@ export default {
   }
 };
 </script>
+<style scoped>
+ div ::v-deep .v-slide-group__prev,.v-slide-group__prev--disabled{
+   display:none !important;
+ }
+ div ::v-deep .v-tab {
+   font-size: 12px !important;
+   padding : 0px 10px !important;
+   min-width: 30px !important;
+ }
+</style>

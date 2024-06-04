@@ -52,8 +52,7 @@
             </v-row>
           </v-stepper-content>
           <v-stepper-content step="2">
-            <!-- Content for Step 3 -->
-            <v-divider class="my-3"></v-divider>
+            <!-- Content for Step 2 -->
             <v-row>
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
                 <v-icon left class="mr-2">mdi-account-outline</v-icon>
@@ -61,11 +60,9 @@
               </v-col>
             </v-row>
             <v-divider class="my-3"></v-divider>
-            <v-row class="justify-center justify-sm-start">
-              <v-col cols="3" v-for="(number, index) in numberOfPersons" :key="index" class="text-center">
-                <v-btn  :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
-              </v-col>
-            </v-row>
+            <div class="d-flex flex-wrap justify-center">
+                <v-btn v-for="(number, index) in numberOfPersons" :key="index" class="personBtn" :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+            </div>
             <v-divider class="my-3"></v-divider>
             <v-row>
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
@@ -74,28 +71,26 @@
               </v-col>
             </v-row>
             <v-divider class="my-3"></v-divider>
-            <v-row class="justify-center justify-sm-start">
-              <v-col cols="3" v-for="(number, index) in numberOfChildren" :key="index" class="text-center">
-                <v-btn  :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
-              </v-col>
-            </v-row>
+            <div class="d-flex flex-wrap justify-center justify-sm-space-around">
+              <v-btn v-for="(number, index) in numberOfChildren" :key="index" class="personBtn" :class="{'selected':isSelectedNumberOfChildren(number)}"  outlined @click="selectNumberOfChildren(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+            </div>
           </v-stepper-content>
           <v-stepper-content step="3">
-            <!-- Content for Step 2 -->
+            <!-- Content for Step 3 -->
+            <div v-if="locations?.length>1">
             <v-row>
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
                 <v-icon left class="mr-2">mdi-map-marker</v-icon>
                 <h3 class="my-0">Scegli la sala</h3>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12" class="text-center ">
-                <v-btn outlined large class="mr-3 font-weight-bold">Interno</v-btn>
-                <v-btn outlined large class="font-weight-bold">Dehor</v-btn>
-              </v-col>
-            </v-row>
             <v-divider class="my-3"></v-divider>
-            <v-row>
+            <div class=" d-flex flex-wrap justify-center">
+                <v-btn v-for="location in locations" :key="location.id"  outlined large class="font-weight-bold" :class="{'selected':isSelectedLocation(location.id)}" @click="selectLocation(location.id)">{{location.name }}</v-btn>
+            </div>
+            <v-divider class="my-3"></v-divider>
+            </div>
+            <v-row id="time">
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
                 <v-icon left class="mr-2">mdi-clock-outline</v-icon>
                 <h3 class="my-0">Scegli l'orario</h3>
@@ -116,7 +111,7 @@
 
               </v-col>
             </v-row>
-             <v-divider class="my-3"></v-divider>
+             <v-divider v-if="lunchTimes.length"  class="my-3"></v-divider>
             <v-row v-if="dinnerTimes.length">
               <v-col cols="12" class="mb-2 ">
                 <h3 class="mb-3">Cena</h3>
@@ -173,7 +168,7 @@ export default {
       lunchTimes: [],
       dinnerTimes: [],
       numberOfPersons: Array.from({length: 16}, (_, i) => i + 1),
-      numberOfChildren: Array.from({length: 4}, (_, i) => i + 1),
+      numberOfChildren: Array.from({length: 5}, (_, i) => i ),
       steps: [
         {step: 1, icon: 'mdi-calendar-month-outline', label: 'Data', value: ''},
         {step: 2, icon: 'mdi-account-outline', label: 'Persone', value: ''},
@@ -193,6 +188,8 @@ export default {
       locations: null,
       bookableDays: [],
       enabledDays: [],
+      selectedLocation: null,
+      selectedChildren:0,
     };
   },
   watch: {
@@ -273,18 +270,31 @@ export default {
     selectTime(time) {
       this.steps[2].value = time.time;
       this.completeStep(3);
-      this.goToStep(3);
+      this.goToStep(4);
     },
     isSelectedTime(time) {
-      return this.steps[1].value === time;
+      return this.steps[2].value === time;
     },
     isSelectedNumberOfPersons(number) {
-      return this.steps[2].value === number + ' persone';
+      return this.steps[1].value === number + ' persone';
     },
     selectNumberOfPersons(number) {
       this.steps[1].value = number + ' persone';
       this.completeStep(2);
       this.goToStep(4);
+    },
+    selectNumberOfChildren(number) {
+      this.selectedChildren= number;
+    },
+    isSelectedNumberOfChildren(number) {
+      return this.selectedChildren === number;
+    },
+    selectLocation(location) {
+      this.selectedLocation= location;
+
+    },
+    isSelectedLocation(location) {
+      return this.selectedLocation === location;
     },
     updateEnabledDays() {
       this.enabledDays = this.bookableDays.map((day) => day.date);
@@ -296,24 +306,23 @@ export default {
         console.log(error)
        return error
       } else {
-        const {  locations, bookableDays} = result;
-        return { locations, bookableDays };
+        const {  locations, bookableDays, settings} = result;
+        return { locations, bookableDays, settings};
       }
     }
   },
   async created() {
-    const {bookableDays, locations} = await this.authenticate()
-    this.bookableDays = bookableDays.map((day) => {
-      if (day.isDAY_OPEN) {
-        {
+    const {bookableDays, locations,settings} = await this.authenticate()
+    this.numberOfPersons = Array.from({length: settings?.options?.maxBookableCovers}, (_, i) => i + 1);
+    this.bookableDays = bookableDays
+        .filter((day) => day.isDAY_OPEN)
+        .map((day) => {
           return {
-            date: new Date(day.date).toLocaleDateString('it-It'),
-            isDINNER_OPEN: false,
+            date: new Date(day?.date).toLocaleDateString('it-IT'),
+            isDINNER_OPEN: day.isDINNER_OPEN,
             isLUNCH_OPEN: day.isLUNCH_OPEN,
-          }
-        }
-      }
-    });
+          };
+        });
     this.locations = locations;
     this.updateEnabledDays();
   }
@@ -476,5 +485,11 @@ v-icon {
   box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
   font-weight: 600;
   background-color: rgb(238, 246, 245);
+}
+.d-flex {
+  gap: 12px;
+}
+.personBtn{
+  max-width: 84px;
 }
 </style>

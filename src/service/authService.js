@@ -5,8 +5,8 @@ const authService = {
     async authenticate(bookingId) {
         const customerId = localStorage.getItem('customerId');
         // const hostname = window.location.hostname;
-        // const hostname = 'bellavida.ibookrestaurant.com';
-        const hostname = 'tamashi.aibooking.cloud';
+        const hostname = 'bellavida.ibookrestaurant.com';
+        // const hostname = 'tamashi.aibooking.cloud';
 
         const payload = JSON.stringify({
             action: "Authenticate",
