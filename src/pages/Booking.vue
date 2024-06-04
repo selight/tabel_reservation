@@ -2,13 +2,14 @@
   <v-container>
     <v-card flat max-width="600px">
       <v-img
-      height="200px"
-      cover
-      position="top"
-      src="../assets/tamashiBookingImage.jpg"
-    ></v-img>
+          height="180px"
+          cover
+          position="top"
+          v-if="step!==4"
+          src="../assets/tamashiBookingImage.jpg"
+      ></v-img>
 
-      <div  class="text-center font-weight-bold  text-h5">Tamashi Ramen</div>
+      <div class="text-center font-weight-bold  text-h5">Tamashi Ramen</div>
       <v-divider class="my-2"></v-divider>
 
       <v-stepper v-model="step" dense>
@@ -22,7 +23,9 @@
                 :editable="step > stepItem.step"
                 @click="goToStep(stepItem.step)"
             >
-              <v-icon left v-if="!stepItem.value" :color="step >= stepItem.step ? 'white' : ''" size="12px">{{ stepItem.icon }}</v-icon>
+              <v-icon left v-if="!stepItem.value" :color="step >= stepItem.step ? 'white' : ''" size="12px">
+                {{ stepItem.icon }}
+              </v-icon>
               <span v-if="!stepItem.value && step === stepItem.step">{{ stepItem.label }}</span>
               <span v-else>{{ stepItem.value }}</span>
 
@@ -33,21 +36,31 @@
 
         <v-stepper-items>
           <v-divider class="my-2"></v-divider>
+          <v-banner  color="pink-darken-1"
+                     icon="mdi-account-box"
+                     lines="two"  closeable outlined v-show="showAlert">
+            <v-banner-text>
+              {{alert}}
+            </v-banner-text>
+            <v-banner-actions>
+              <v-btn  dense outlined @click="refresh">Refresh</v-btn>
+            </v-banner-actions>
+          </v-banner>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
                 <the-calender
                     v-if="enabledDays.length>0"
                     :on-day-click="onDateChange"
-                              :show-outside-days="false"
-                              :eventDays="[
+                    :show-outside-days="false"
+                    :eventDays="[
                                   { date: '2024/05/29', promotionText: '50%' },
                                   { date: '2024/05/28', promotionText: '20%' },
                                   { date: '2024/05/30', promotionText: '30%' },
                                   { date: '2024/05/31', promotionText: 'Sale' }
                                   ]"
-                              :enabled-days="enabledDays"
-                              :disabled-days="['30/05/2024']"/>
+                    :enabled-days="enabledDays"
+                    :disabled-days="['30/05/2024']"/>
               </v-col>
             </v-row>
           </v-stepper-content>
@@ -61,7 +74,9 @@
             </v-row>
             <v-divider class="my-3"></v-divider>
             <div class="d-flex flex-wrap justify-center">
-                <v-btn v-for="(number, index) in numberOfPersons" :key="index" class="personBtn" :class="{'selected':isSelectedNumberOfPersons(number)}"  outlined @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+              <v-btn v-for="(number, index) in numberOfPersons" :key="index" class="personBtn"
+                     :class="{'selected':isSelectedNumberOfPersons(number)}" outlined
+                     @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
             </div>
             <v-divider class="my-3"></v-divider>
             <v-row>
@@ -72,23 +87,28 @@
             </v-row>
             <v-divider class="my-3"></v-divider>
             <div class="d-flex flex-wrap justify-center justify-sm-space-around">
-              <v-btn v-for="(number, index) in numberOfChildren" :key="index" class="personBtn" :class="{'selected':isSelectedNumberOfChildren(number)}"  outlined @click="selectNumberOfChildren(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+              <v-btn v-for="(number, index) in numberOfChildren" :key="index" class="personBtn"
+                     :class="{'selected':isSelectedNumberOfChildren(number)}" outlined
+                     @click="selectNumberOfChildren(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
             </div>
           </v-stepper-content>
           <v-stepper-content step="3">
             <!-- Content for Step 3 -->
             <div v-if="locations?.length>1">
-            <v-row>
-              <v-col cols="12" class="pb-2 d-flex align-center justify-center">
-                <v-icon left class="mr-2">mdi-map-marker</v-icon>
-                <h3 class="my-0">Scegli la sala</h3>
-              </v-col>
-            </v-row>
-            <v-divider class="my-3"></v-divider>
-            <div class=" d-flex flex-wrap justify-center">
-                <v-btn v-for="location in locations" :key="location.id"  outlined large class="font-weight-bold" :class="{'selected':isSelectedLocation(location.id)}" @click="selectLocation(location.id)">{{location.name }}</v-btn>
-            </div>
-            <v-divider class="my-3"></v-divider>
+              <v-row>
+                <v-col cols="12" class="pb-2 d-flex align-center justify-center">
+                  <v-icon left class="mr-2">mdi-map-marker</v-icon>
+                  <h3 class="my-0">Scegli la sala</h3>
+                </v-col>
+              </v-row>
+              <v-divider class="my-3"></v-divider>
+              <div class=" d-flex flex-wrap justify-center">
+                <v-btn v-for="location in locations" :key="location.id" outlined large class="font-weight-bold"
+                       :class="{'selected':isSelectedLocation(location.id)}" @click="selectLocation(location.id)">
+                  {{ location.name }}
+                </v-btn>
+              </div>
+              <v-divider class="my-3"></v-divider>
             </div>
             <v-row id="time">
               <v-col cols="12" class="pb-2 d-flex align-center justify-center">
@@ -102,24 +122,26 @@
                 <h3 class="mb-3">Pranzo</h3>
                 <v-row class="justify-sm-start justify-space-around">
                   <v-col v-for="time in lunchTimes" :key="time.time" cols="auto">
-                    <v-btn large :class="{'selected': isSelectedTime(time.time)}"  class="position-relative" outlined @click="selectTime(time)">
-                      <span class="px-4">{{ time.time }}</span>
-                      <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
+                    <v-btn large :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
+                           @click="selectTime(time)">
+                      <span class="px-6 px-sm-4">{{ time.time }}</span>
+                      <div :class="getStatusClass(time.status)" class="time-label">{{ time.status }}</div>
                     </v-btn>
                   </v-col>
                 </v-row>
 
               </v-col>
             </v-row>
-             <v-divider v-if="lunchTimes.length"  class="my-3"></v-divider>
+            <v-divider v-if="lunchTimes.length" class="my-3"></v-divider>
             <v-row v-if="dinnerTimes.length">
               <v-col cols="12" class="mb-2 ">
                 <h3 class="mb-3">Cena</h3>
                 <v-row class="justify-sm-start justify-space-around">
                   <v-col v-for="time in dinnerTimes" :key="time.time" cols="auto">
-                    <v-btn large :class="{'selected': isSelectedTime(time.time)}"  class="position-relative" outlined @click="selectTime(time)">
-                      <span class=" px-4">{{ time.time }}</span>
-                      <div  :class="getStatusClass(time.status)" class="time-label">{{time.status}}</div>
+                    <v-btn large  :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
+                           @click="selectTime(time)">
+                      <span class=" px-4 px-6 px-sm-4">{{ time.time }}</span>
+                      <div :class="getStatusClass(time.status)" class="time-label">{{ time.status }}</div>
                     </v-btn>
                   </v-col>
                 </v-row>
@@ -168,15 +190,15 @@ export default {
       lunchTimes: [],
       dinnerTimes: [],
       numberOfPersons: Array.from({length: 16}, (_, i) => i + 1),
-      numberOfChildren: Array.from({length: 5}, (_, i) => i ),
+      numberOfChildren: Array.from({length: 5}, (_, i) => i),
       steps: [
         {step: 1, icon: 'mdi-calendar-month-outline', label: 'Data', value: ''},
         {step: 2, icon: 'mdi-account-outline', label: 'Persone', value: ''},
         {step: 3, icon: 'mdi-clock-outline', label: 'Orario', value: ''},
         {step: 4, icon: 'mdi-information-outline', label: 'Dati Prenotazione', value: ''},
       ],
-      completedSteps:new Set(),
-      bookingId:'',
+      completedSteps: new Set(),
+      bookingId: '',
       booking: {
         date: null,
         mealId: null,
@@ -189,13 +211,19 @@ export default {
       bookableDays: [],
       enabledDays: [],
       selectedLocation: null,
-      selectedChildren:0,
+      selectedChildren: 0,
+      selectedNumberOfPeople: 0,
+      alert: 'Impossibile recuperare le date disponibili, fare clic qui per aggiornare.',
+      showAlert:false
     };
   },
   watch: {
     step(newStep) {
       this.resetStepsAfter(newStep);
     },
+    selectedChildren(newChildren) {
+      if (newChildren > 0) this.updateNumberOfChildren(newChildren)
+    }
   },
   components: {
     informationTabsComponent,
@@ -226,23 +254,23 @@ export default {
       console.log('Form submitted');
       // Handle form submission logic
     },
-    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes,status) {
-      return Array.from({ length: slotCount }, (_, i) => {
+    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes, status) {
+      return Array.from({length: slotCount}, (_, i) => {
         const time = new Date(2024, 5, 1, startHour, startMinute);
         time.setMinutes(time.getMinutes() + i * intervalMinutes);
         return {
-          time: time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+          time: time.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'}),
           status: status || TimeStatus.DISPONIBLE,
         };
       });
     },
     onDateChange(date) {
       const selectedDay = this.bookableDays.find((day) => day.date === date.toLocaleDateString('it-IT'));
-      if(selectedDay.isLUNCH_OPEN){
-        this.lunchTimes= this.generateTimeSlots(12, 0, 6, 30);
+      if (selectedDay.isLUNCH_OPEN) {
+        this.lunchTimes = this.generateTimeSlots(12, 0, 6, 30);
       }
-      if(selectedDay.isDINNER_OPEN){
-        this.dinnerTimes= this.generateTimeSlots(19, 0, 6, 30);
+      if (selectedDay.isDINNER_OPEN) {
+        this.dinnerTimes = this.generateTimeSlots(19, 0, 6, 30);
       }
       // format the date to show the date number and month name shortned
       date = new Date(date).toLocaleDateString('it-IT', {
@@ -279,19 +307,35 @@ export default {
       return this.steps[1].value === number + ' persone';
     },
     selectNumberOfPersons(number) {
-      this.steps[1].value = number + ' persone';
+      this.selectedNumberOfPeople = number;
+      if (this.selectedChildren > 0) {
+        this.steps[1].value = number + ' + ' + this.selectedChildren + ' persone';
+      } else {
+        this.steps[1].value = number + ' persone';
+      }
       this.completeStep(2);
       this.goToStep(4);
     },
     selectNumberOfChildren(number) {
-      this.selectedChildren= number;
+      this.selectedChildren = number;
     },
     isSelectedNumberOfChildren(number) {
       return this.selectedChildren === number;
     },
+    updateNumberOfChildren(number) {
+      this.steps[1].value = this.selectedNumberOfPeople ? this.selectedNumberOfPeople + ' + ' + number + ' persone' : number + ' bambini';
+      if (this.selectedNumberOfPeople) {
+        this.completeStep(2);
+        this.goToStep(4);
+      }
+    },
     selectLocation(location) {
-      this.selectedLocation= location;
-
+      this.selectedLocation = location;
+    },
+    refresh(){
+      //reload the page
+      this.showAlert = false;
+      window.location.reload();
     },
     isSelectedLocation(location) {
       return this.selectedLocation === location;
@@ -300,19 +344,19 @@ export default {
       this.enabledDays = this.bookableDays.map((day) => day.date);
     },
     async authenticate() {
-      const { result, error } = await authService.authenticate(this.bookingId);
+      const {result, error} = await authService.authenticate(this.bookingId);
 
       if (error) {
-        console.log(error)
-       return error
+        this.showAlert = true;
+        throw error
       } else {
-        const {  locations, bookableDays, settings} = result;
-        return { locations, bookableDays, settings};
+        const {locations, bookableDays, settings} = result;
+        return {locations, bookableDays, settings};
       }
     }
   },
   async created() {
-    const {bookableDays, locations,settings} = await this.authenticate()
+    const {bookableDays, locations, settings} = await this.authenticate()
     this.numberOfPersons = Array.from({length: settings?.options?.maxBookableCovers}, (_, i) => i + 1);
     this.bookableDays = bookableDays
         .filter((day) => day.isDAY_OPEN)
@@ -334,18 +378,23 @@ export default {
 .text-center {
   text-align: center;
 }
+
 div ::v-deep .v-stepper {
-   box-shadow: none !important;
+  box-shadow: none !important;
 }
-div ::v-deep .v-stepper__step__step{
+
+div ::v-deep .v-stepper__step__step {
   display: none !important;
 }
+
 div ::v-deep .v-stepper__header .v-ripple__container {
   display: none !important;
 }
+
 div ::v-deep .v-stepper__content {
   padding: 0 !important;
 }
+
 @media only screen and (max-width: 959.98px) {
   div ::v-deep .v-stepper:not(.v-stepper--vertical) .v-stepper__label {
     display: block !important;
@@ -356,8 +405,9 @@ div ::v-deep .v-stepper__content {
     text-overflow: ellipsis;
   }
 }
-div ::v-deep  .v-stepper__label {
-    text-align: center !important;
+
+div ::v-deep .v-stepper__label {
+  text-align: center !important;
 }
 
 div ::v-deep .v-stepper__header {
@@ -400,6 +450,7 @@ div ::v-deep .v-stepper__header {
   background-color: black !important;
   color: white;
 }
+
 .step.active span {
   position: relative;
   z-index: 2;
@@ -466,6 +517,7 @@ v-icon {
   background-color: gray;
   font-weight: bold;
 }
+
 .status-disponible {
   background-color: green;
 }
@@ -481,15 +533,20 @@ v-icon {
 .status-non-disponible {
   background-color: gray;
 }
+
 .selected {
-  box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
+  box-shadow: rgb(0, 51, 46) 0px 0px 0px 1px inset, rgb(189, 219, 216) 0px 0px 0px 3px inset;
   font-weight: 600;
   background-color: rgb(238, 246, 245);
 }
+
 .d-flex {
-  gap: 12px;
+  gap: 11px;
 }
-.personBtn{
+
+.personBtn {
   max-width: 84px;
+  min-width: 50px !important;
+  letter-spacing: 0 !important;
 }
 </style>

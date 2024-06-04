@@ -1,6 +1,6 @@
 <template>
   <v-card flat>
-    <v-tabs v-model="tab" align-tabs="start" color="black">
+    <v-tabs v-model="tab" align-tabs="start" >
       <v-tab>Dati</v-tab>
       <v-tab>FAQ</v-tab>
       <v-tab>Parking</v-tab>
@@ -9,37 +9,47 @@
       <!-- Tab items -->
       <v-tab-item>
         <!-- Dati Content -->
-        <v-form @submit.prevent="submitForm">
-          <v-text-field label="Nome e Cognome" v-model="userDetails.nome" required></v-text-field>
-          <v-text-field label="Email" v-model="userDetails.email" required></v-text-field>
-          <div>
-          <v-text-field label="Telefono" v-model="userDetails.telefono" required></v-text-field>
-            <v-text-field label="CAP Rezisdenza" v-model="userDetails.cap" required></v-text-field>
-          </div>
+        <v-form @submit.prevent="submitForm" class="pa-1 d-flex flex-column ">
+          <v-row>
+            <v-col cols="3" sm="2">
+          <v-select
+            v-model="userDetails.title"
+            :items="['Mr', 'Ms', 'Mrs']"
+            label="Title"
+            required
+            hide-details="auto"
+          ></v-select>
+            </v-col>
+            <v-col>
+          <v-text-field  label="Nome e Cognome" hide-details="auto" v-model="userDetails.nome" required></v-text-field>
+            </v-col>
+          </v-row>
+          <v-text-field dense label="Email" hide-details="auto" v-model="userDetails.email" required></v-text-field>
+          <v-row >
+            <v-col cols="7" >
+          <v-text-field dense label="Telefono" hide-details="auto" v-model="userDetails.telefono" required></v-text-field>
+          </v-col>
+            <v-col >
+              <v-text-field dense label="CAP Rezisdenza" hide-details="auto" v-model="userDetails.cap" required></v-text-field>
+            </v-col>
+          </v-row>
+          <v-text-field dense label="Note" hide-details="auto"  autogrow ></v-text-field>
         </v-form>
-        <v-row>
-          <v-col cols="6">
-            <v-card class="pa-1 mb-1">
-              <v-checkbox v-model="extraItems.senzaGluten" label="Senza Glutine"></v-checkbox>
-              <v-checkbox v-model="extraItems.senzaLattosio" label="Senza Lattosio"></v-checkbox>
-              <v-checkbox v-model="extraItems.vegan" label="Cibi Vegetarini"></v-checkbox>
-              <v-checkbox v-model="extraItems.sunio" label="No carne Sunia"></v-checkbox>
+        <v-row class="no-gutters my-2">
+          <v-col cols="6"  >
+            <v-card flat outlined class="mr-sm-3 mr-2">
+              <v-checkbox hide-details="auto" v-for="(item,i) in extraItems" :key="i" dense class="ma-0"  v-model="item.value" :label="item.label"></v-checkbox>
             </v-card>
           </v-col>
           <v-col cols="6">
-            <v-card class="pa-1 mb-1">
-              <v-checkbox v-model="specialThings.birthday" label="Portero torta Compleanno"></v-checkbox>
-              <v-checkbox v-model="specialThings.bambino" label="Bambino in carrozina"></v-checkbox>
-              <v-checkbox v-model="specialThings.pets" label="Presenza Cane"></v-checkbox>
-              <v-checkbox v-model="specialThings.pets" label="Seggiolino"></v-checkbox>
-            </v-card>
+            <v-card flat outlined>
+              <v-checkbox v-for="(item,i) in specialThings" hide-details="auto" :key="i"  dense  class="ma-0"  v-model="item.value"  :label="item.label" >
+              </v-checkbox>
+              </v-card>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col cols="12" class="ma-3">
-            <v-checkbox v-model="subscribePromotions" label="Do you want to subscribe to our promotions?"></v-checkbox>
-          </v-col>
-        </v-row>
+            <v-checkbox hide-details="auto" v-model="subscribePromotions" label="Do you want to subscribe to our promotions?"></v-checkbox>
+
       </v-tab-item>
 
       <v-tab-item>
@@ -72,15 +82,40 @@ export default {
         telefono: ''
       },
       extraItems: {
-        senzaGluten: false,
-        senzaLattosio: false,
-        vegan:false,
-        sunio:false,
+        senzaGluten: {
+          value: false,
+          label: 'Senza Glutine'
+        },
+        senzaLattosio: {
+          value: false,
+          label: 'Senza Lattosio'
+        },
+        vegan: {
+          value: false,
+          label: 'Cibi Vegetarini'
+        },
+        sunio: {
+          value: false,
+          label: 'No carne Sunia'
+        }
       },
       specialThings: {
-        birthday: false,
-        pets: false,
-        bambino:false
+        birthday: {
+          value: false,
+          label: 'Portero torta '
+        },
+        pets: {
+          value: false,
+          label: 'Presenza Cane'
+        },
+        bambino:{
+          value: false,
+          label: 'Bambino in carrozina'
+        },
+        seggiolino:{
+          value: false,
+          label: 'Seggiolino'
+        }
       },
       subscribePromotions: false
 
@@ -104,5 +139,17 @@ export default {
    font-size: 12px !important;
    padding : 0px 10px !important;
    min-width: 30px !important;
+ }
+ div ::v-deep .v-slide-group__content{
+   justify-content: space-between;
+ }
+ div ::v-deep .v-messages{
+
+ }
+ div ::v-deep .v-input .v-label {
+   font-size: 12px !important;
+ }
+ .d-flex{
+   gap: 10px;
  }
 </style>
