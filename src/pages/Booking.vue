@@ -36,16 +36,17 @@
 
         <v-stepper-items>
           <v-divider class="my-2"></v-divider>
-          <v-banner  color="pink-darken-1"
-                     icon="mdi-account-box"
-                     lines="two"  closeable outlined v-show="showAlert">
-            <v-banner-text>
+          <v-alert  type="error" prominent
+                    dismissible outlined  v-show="showAlert">
+            <v-row align="center">
+              <v-col class="grow">
               {{alert}}
-            </v-banner-text>
-            <v-banner-actions>
-              <v-btn  dense outlined @click="refresh">Refresh</v-btn>
-            </v-banner-actions>
-          </v-banner>
+              </v-col>
+              <v-col class="shrink">
+                <v-btn dense outlined @click="refresh">Ricaricare</v-btn>
+              </v-col>
+            </v-row>
+          </v-alert>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
