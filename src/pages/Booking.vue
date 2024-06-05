@@ -37,16 +37,18 @@
         <v-stepper-items>
           <v-divider class="my-2"></v-divider>
           <v-alert  type="error" prominent
-                    dismissible outlined  v-show="showAlert">
+                     outlined  v-show="showAlert">
             <v-row align="center">
               <v-col class="grow">
               {{alert}}
               </v-col>
               <v-col class="shrink">
-                <v-btn dense outlined @click="refresh">Ricaricare</v-btn>
+                <v-btn dense outlined @click="refresh">Ricarica</v-btn>
               </v-col>
             </v-row>
+
           </v-alert>
+          <v-skeleton-loader v-if="loading" type="date-picker-day"></v-skeleton-loader>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
@@ -118,38 +120,24 @@
               </v-col>
             </v-row>
             <v-divider class="my-3"></v-divider>
-            <v-row v-if="lunchTimes.length">
-              <v-col cols="12" class="mb-2">
-                <h3 class="mb-3">Pranzo</h3>
-                <v-row class="justify-sm-start justify-space-around">
-                  <v-col v-for="time in lunchTimes" :key="time.time" cols="auto">
-                    <v-btn large :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
-                           @click="selectTime(time)">
-                      <span class="px-6 px-sm-4">{{ time.time }}</span>
-                      <div :class="getStatusClass(time.status)" class="time-label">{{ time.status }}</div>
-                    </v-btn>
-                  </v-col>
-                </v-row>
-
-              </v-col>
-            </v-row>
-            <v-divider v-if="lunchTimes.length" class="my-3"></v-divider>
-            <v-row v-if="dinnerTimes.length">
-              <v-col cols="12" class="mb-2 ">
-                <h3 class="mb-3">Cena</h3>
-                <v-row class="justify-sm-start justify-space-around">
-                  <v-col v-for="time in dinnerTimes" :key="time.time" cols="auto">
-                    <v-btn large  :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
-                           @click="selectTime(time)">
-                      <span class=" px-4 px-6 px-sm-4">{{ time.time }}</span>
-                      <div :class="getStatusClass(time.status)" class="time-label">{{ time.status }}</div>
-                    </v-btn>
-                  </v-col>
-                </v-row>
-
-              </v-col>
-            </v-row>
-
+            <div v-for="(meal, index) in meals" :key="index">
+              <v-row v-if="meal.times.length">
+                <v-col cols="12" class="mb-2">
+                  <h3 class="mb-3">{{ meal.label }}</h3>
+                  <v-row class="justify-sm-start justify-space-around">
+                    <v-col v-for="time in meal.times" :key="time.time" cols="6" sm="3">
+                      <v-btn block x-large :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
+                             @click="selectTime(time)">
+                        <div class="top-text" v-if="time.promotionText">{{time?.promotionText}}</div>
+                        <span class=" px-sm-4 ">{{ time.time }}</span>
+                        <div :class="getStatusClass(time?.status)" class="time-label">{{ time.status }}</div>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <v-divider v-if="meal.times.length" class="my-3"></v-divider>
+            </div>
           </v-stepper-content>
 
 
@@ -186,8 +174,8 @@ export default {
     return {
       step: 1,
       selectedDate: null,
-      minDate: new Date().toISOString().substr(0, 10),
-      maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().substr(0, 10),
+      minDate: new Date().toISOString().substring(0, 10),
+      maxDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().substring(0, 10),
       lunchTimes: [],
       dinnerTimes: [],
       numberOfPersons: Array.from({length: 16}, (_, i) => i + 1),
@@ -214,9 +202,18 @@ export default {
       selectedLocation: null,
       selectedChildren: 0,
       selectedNumberOfPeople: 0,
+      loading: false,
       alert: 'Impossibile recuperare le date disponibili, fare clic qui per aggiornare.',
-      showAlert:false
+      showAlert:false,
     };
+  },
+  computed:{
+    meals() {
+      return [
+        { label: 'Pranzo', times: this.lunchTimes },
+        { label: 'Cena', times: this.dinnerTimes },
+      ];
+    },
   },
   watch: {
     step(newStep) {
@@ -255,25 +252,30 @@ export default {
       console.log('Form submitted');
       // Handle form submission logic
     },
-    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes, status) {
+    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes) {
       return Array.from({length: slotCount}, (_, i) => {
         const time = new Date(2024, 5, 1, startHour, startMinute);
         time.setMinutes(time.getMinutes() + i * intervalMinutes);
-        return {
-          time: time.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'}),
-          status: status || TimeStatus.DISPONIBLE,
-        };
+
+        return time.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'})
+
       });
     },
     onDateChange(date) {
       const selectedDay = this.bookableDays.find((day) => day.date === date.toLocaleDateString('it-IT'));
       if (selectedDay.isLUNCH_OPEN) {
-        this.lunchTimes = this.generateTimeSlots(12, 0, 6, 30);
+        let generatedLunchtimes = this.generateTimeSlots(12, 0, 6, 30);
+        generatedLunchtimes.forEach((time) => {
+          this.lunchTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='12:00' ? 'Bevanda Omaggio' : null});
+        });
       }
       if (selectedDay.isDINNER_OPEN) {
-        this.dinnerTimes = this.generateTimeSlots(19, 0, 6, 30);
+        let generatedDinnerTimes = this.generateTimeSlots(19, 0, 6, 30);
+        generatedDinnerTimes.forEach((time) => {
+          this.dinnerTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='19:00' ? 'Bevanda Omaggio' : null});
+        });
       }
-      // format the date to show the date number and month name shortned
+      // format the date to show the date number and month name shortened
       date = new Date(date).toLocaleDateString('it-IT', {
         day: 'numeric',
         month: 'short',
@@ -345,8 +347,9 @@ export default {
       this.enabledDays = this.bookableDays.map((day) => day.date);
     },
     async authenticate() {
+      this.loading=true;
       const {result, error} = await authService.authenticate(this.bookingId);
-
+      this.loading=false;
       if (error) {
         this.showAlert = true;
         throw error
@@ -518,6 +521,16 @@ v-icon {
   background-color: gray;
   font-weight: bold;
 }
+.top-text{
+  position: absolute;
+  top: -15px;
+  text-align: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 2px;
+  letter-spacing: 0;
+}
 
 .status-disponible {
   background-color: green;
@@ -536,7 +549,7 @@ v-icon {
 }
 
 .selected {
-  box-shadow: rgb(0, 51, 46) 0px 0px 0px 1px inset, rgb(189, 219, 216) 0px 0px 0px 3px inset;
+  box-shadow: rgb(0, 51, 46) 0 0 0 1px inset, rgb(189, 219, 216) 0 0 0 3px inset;
   font-weight: 600;
   background-color: rgb(238, 246, 245);
 }
