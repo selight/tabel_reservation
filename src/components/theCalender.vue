@@ -11,14 +11,14 @@
       </div>
       <div class="calendar-day" v-for="(day, index) in days" :key="index">
         <button
-          :class="[
+            :class="[
             'day-content',
             { 'd-none': !day.date },
             { outside: day.outside },
             { 'disabled-day': isDisabledDay(day.date)  || isPastDay(day.date) ||!day.enabled },
             { 'selected-day': isSelectedDay(day.date)},
           ]"
-          @click="
+            @click="
             !isDisabledDay(day.date) &&
               !isPastDay(day.date) &&
               handleDayClick(day.date)
@@ -54,7 +54,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    enabledDays:{
+    enabledDays: {
       type: Array,
       default: () => [],
     },
@@ -90,8 +90,8 @@ export default {
     updateDays() {
       this.days = this.generateDays(this.currentYear, this.currentMonth);
     },
-    isDateEnabled(date){
-      return  this.enabledDays.length ? this.enabledDays.includes(date?.toLocaleDateString("it-IT")) : true;
+    isDateEnabled(date) {
+      return this.enabledDays.length ? this.enabledDays.includes(date?.toLocaleDateString("it-IT")) : true;
     },
     generateDays(year, month) {
       const days = [];
@@ -102,18 +102,22 @@ export default {
       // Add days of previous month to fill the first week
       if (this.showOutsideDays) {
         for (let i = firstDay.getDay(); i > 0; i--) {
-          days.unshift({ date: new Date(year, month, 1 - i), outside: true });
+          days.unshift({date: new Date(year, month, 1 - i), outside: true});
         }
       } else {
         // If outside days are disabled, add empty placeholders for the first week
         for (let i = 0; i < firstDay.getDay(); i++) {
-          days.push({ date: null, outside: true });
+          days.push({date: null, outside: true});
         }
       }
 
       // Add days of the current month
       for (let i = 1; i <= numDays; i++) {
-        days.push({ date: new Date(year, month, i), outside: false, enabled: this.isDateEnabled(new Date(year, month, i)) });
+        days.push({
+          date: new Date(year, month, i),
+          outside: false,
+          enabled: this.isDateEnabled(new Date(year, month, i))
+        });
       }
 
       // Add days of the next month to fill remaining rows
@@ -121,13 +125,13 @@ export default {
         const totalDays = days.length;
         const remainingDays = 42 - totalDays; // 6 rows * 7 days
         for (let i = 1; i <= remainingDays; i++) {
-          days.push({ date: new Date(year, month + 1, i), outside: true });
+          days.push({date: new Date(year, month + 1, i), outside: true});
         }
       } else {
         const totalDays = days.length;
         const remainingDays = 35 - totalDays; // 5 rows * 7 days
         for (let i = 1; i <= remainingDays; i++) {
-          days.push({ date: null, outside: true });
+          days.push({date: null, outside: true});
         }
       }
       return days;
@@ -139,7 +143,7 @@ export default {
       const formattedDate = date.toLocaleDateString("it-IT");
       return this.eventDays.some((event) => {
         const formattedEventDate = new Date(event.date).toLocaleDateString(
-          "en-GB"
+            "en-GB"
         );
         return formattedEventDate === formattedDate;
       });
@@ -151,7 +155,7 @@ export default {
       const formattedDate = date.toLocaleDateString("it-IT");
       const event = this.eventDays.find((event) => {
         const formattedEventDate = new Date(event.date).toLocaleDateString(
-          "it-IT"
+            "it-IT"
         );
         return formattedEventDate === formattedDate;
       });
@@ -296,6 +300,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .selected-day {
   box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
   font-weight: 500;

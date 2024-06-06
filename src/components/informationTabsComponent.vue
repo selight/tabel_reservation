@@ -9,8 +9,11 @@
       <!-- Tab items -->
       <v-tab-item>
         <!-- Dati Content -->
+        <BookingComplete v-if="showBookingComplete" :type="type"/>
+        <div v-else>
         <v-form @submit.prevent="submitForm" class="pa-1 d-flex flex-column ">
-          <v-row>
+          <div>
+          <v-row >
             <v-col cols="3" sm="2">
           <v-select
             v-model="userDetails.title"
@@ -21,18 +24,24 @@
           ></v-select>
             </v-col>
             <v-col>
-          <v-text-field  label="Nome e Cognome" hide-details="auto" v-model="userDetails.nome" required></v-text-field>
+          <v-text-field  label="Nome " hide-details="auto" v-model="userDetails.nome" required></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field  label="Cognome" hide-details="auto" v-model="userDetails.cognome" required></v-text-field>
             </v-col>
           </v-row>
-          <v-text-field dense label="Email" hide-details="auto" v-model="userDetails.email" required></v-text-field>
+          </div>
+          <div>
           <v-row >
-            <v-col cols="7" >
+          <v-col cols="7" >
           <v-text-field dense label="Telefono" hide-details="auto" v-model="userDetails.telefono" required></v-text-field>
           </v-col>
             <v-col >
               <v-text-field dense label="CAP Rezisdenza" hide-details="auto" v-model="userDetails.cap" required></v-text-field>
             </v-col>
           </v-row>
+          </div>
+          <v-text-field dense label="Email" hide-details="auto" v-model="userDetails.email" required></v-text-field>
           <v-text-field dense label="Note" hide-details="auto"  autogrow ></v-text-field>
         </v-form>
         <v-row class="no-gutters my-2">
@@ -48,8 +57,13 @@
               </v-card>
           </v-col>
         </v-row>
-            <v-checkbox hide-details="auto" v-model="subscribePromotions" label="Do you want to subscribe to our promotions?"></v-checkbox>
-
+        <v-checkbox hide-details="auto" v-model="subscribePromotions" label="Do you want to subscribe to our promotions?"></v-checkbox>
+        <v-row>
+          <v-col cols="12" class="text-center mt-3">
+            <v-btn color="primary" block @click="submitForm">Prenota</v-btn>
+          </v-col>
+        </v-row>
+        </div>
       </v-tab-item>
 
       <v-tab-item>
@@ -71,13 +85,18 @@
 </template>
 
 <script>
+import BookingComplete from "@/components/bookingComplete.vue";
+import {BookingStatus} from "@/utils/utils";
+
 export default {
   name:'informationTabsComponent',
+  components: {BookingComplete},
   data() {
     return {
       tab: null,
       userDetails: {
         nome: '',
+        cognome: '',
         email: '',
         telefono: ''
       },
@@ -117,16 +136,16 @@ export default {
           label: 'Seggiolino'
         }
       },
-      subscribePromotions: false
-
+      subscribePromotions: false,
+      showBookingComplete: false,
+      type:BookingStatus.LISTA_D_ATTESA,
     };
   },
   methods: {
     submitForm() {
       console.log('Form submitted');
       console.log('User Details:', this.userDetails);
-      // Emit an event to the parent component to handle form submission
-      this.$emit('submit');
+      this.showBookingComplete = true;
     }
   }
 };
@@ -150,6 +169,10 @@ export default {
    font-size: 12px !important;
  }
  .d-flex{
-   gap: 10px;
+   gap: 12px;
+ }
+ div ::v-deep .row + .row {
+    margin-top: 0px
+   /* margin-top: 12px; */
  }
 </style>

@@ -36,8 +36,7 @@
 
         <v-stepper-items>
           <v-divider class="my-2"></v-divider>
-          <v-alert  type="error" prominent
-                     outlined  v-show="showAlert">
+          <v-alert  type="error" prominent outlined  v-show="showAlert">
             <v-row align="center">
               <v-col class="grow">
               {{alert}}
@@ -57,10 +56,10 @@
                     :on-day-click="onDateChange"
                     :show-outside-days="false"
                     :eventDays="[
-                                  { date: '2024/05/29', promotionText: '50%' },
-                                  { date: '2024/05/28', promotionText: '20%' },
-                                  { date: '2024/05/30', promotionText: '30%' },
-                                  { date: '2024/05/31', promotionText: 'Sale' }
+                                  { date: '2024/06/29', promotionText: '50%' },
+                                  { date: '2024/06/28', promotionText: '20%' },
+                                  { date: '2024/06/30', promotionText: '30%' },
+                                  { date: '2024/06/31', promotionText: 'Sale' }
                                   ]"
                     :enabled-days="enabledDays"
                     :disabled-days="['30/05/2024']"/>
@@ -79,7 +78,7 @@
             <div class="d-flex flex-wrap justify-center">
               <v-btn v-for="(number, index) in numberOfPersons" :key="index" class="personBtn"
                      :class="{'selected':isSelectedNumberOfPersons(number)}" outlined
-                     @click="selectNumberOfPersons(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+                     @click="selectPeople('adults',number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
             </div>
             <v-divider class="my-3"></v-divider>
             <v-row>
@@ -92,7 +91,7 @@
             <div class="d-flex flex-wrap justify-center justify-sm-space-around">
               <v-btn v-for="(number, index) in numberOfChildren" :key="index" class="personBtn"
                      :class="{'selected':isSelectedNumberOfChildren(number)}" outlined
-                     @click="selectNumberOfChildren(number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
+                     @click="selectPeople('children',number)"><span class="px-sm-5 ">{{ number }}</span></v-btn>
             </div>
           </v-stepper-content>
           <v-stepper-content step="3">
@@ -125,7 +124,7 @@
                 <v-col cols="12" class="mb-2">
                   <h3 class="mb-3">{{ meal.label }}</h3>
                   <v-row class="justify-sm-start justify-space-around">
-                    <v-col v-for="time in meal.times" :key="time.time" cols="6" sm="3">
+                    <v-col v-for="(time,index) in meal.times" :key="index" cols="6" sm="3">
                       <v-btn block x-large :class="{'selected': isSelectedTime(time.time)}" class="position-relative" outlined
                              @click="selectTime(time)">
                         <div class="top-text" v-if="time.promotionText">{{time?.promotionText}}</div>
@@ -139,16 +138,15 @@
               <v-divider v-if="meal.times.length" class="my-3"></v-divider>
             </div>
           </v-stepper-content>
-
-
           <v-stepper-content step="4">
             <!--            Content for step 4-->
             <information-tabs-component/>
-            <v-row>
-              <v-col cols="12" class="text-center mt-3">
-                <v-btn color="primary" block @click="submitForm">Prenota</v-btn>
-              </v-col>
-            </v-row>
+              <div  class="mx-auto text-center mt-3 " style="max-width: 300px ">
+                <div class="text-bottom-caption">Clica qui per cancellare i tuoi dati personali dal nostro database</div>
+                <a href="#" class="text-subtitle-2 my-2 text--accent-1"><v-icon left size="14px">mdi-account-outline</v-icon>CANCELLAMI</a>
+                <div class="text-bottom-caption font-weight-bold">I dati personali forniti saranno trattati nel respetto della normativa vigente secondo quanto indicato nell'informativa Privacy disponible a questo LINK</div>
+               </div>
+
           </v-stepper-content>
         </v-stepper-items>
       </v-stepper>
@@ -160,14 +158,8 @@
 import informationTabsComponent from "../components/informationTabsComponent.vue";
 import theCalender from "../components/theCalender.vue";
 import authService from '../service/authService';
+import {TimeStatus, generateTimeSlots, getStatusClass} from "@/utils/utils";
 
-
-const TimeStatus = {
-  DISPONIBLE: 'Disponible',
-  POSTI_ESAURITI: 'Posti Esauriti',
-  LISTA_D_ATTESA: "Lista d'attesa",
-  NON_DISPONIBLE: 'Non Disponible'
-};
 export default {
   name: 'BookingPage',
   data() {
@@ -219,15 +211,13 @@ export default {
     step(newStep) {
       this.resetStepsAfter(newStep);
     },
-    selectedChildren(newChildren) {
-      if (newChildren > 0) this.updateNumberOfChildren(newChildren)
-    }
   },
   components: {
     informationTabsComponent,
     theCalender,
   },
   methods: {
+    getStatusClass,
     goToStep(stepNumber) {
       if (this.isStepComplete(stepNumber - 1) || stepNumber === 1) {
         this.step = stepNumber;
@@ -252,25 +242,16 @@ export default {
       console.log('Form submitted');
       // Handle form submission logic
     },
-    generateTimeSlots(startHour, startMinute, slotCount, intervalMinutes) {
-      return Array.from({length: slotCount}, (_, i) => {
-        const time = new Date(2024, 5, 1, startHour, startMinute);
-        time.setMinutes(time.getMinutes() + i * intervalMinutes);
-
-        return time.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'})
-
-      });
-    },
     onDateChange(date) {
       const selectedDay = this.bookableDays.find((day) => day.date === date.toLocaleDateString('it-IT'));
       if (selectedDay.isLUNCH_OPEN) {
-        let generatedLunchtimes = this.generateTimeSlots(12, 0, 6, 30);
+        let generatedLunchtimes = generateTimeSlots(12, 0, 6, 30);
         generatedLunchtimes.forEach((time) => {
           this.lunchTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='12:00' ? 'Bevanda Omaggio' : null});
         });
       }
       if (selectedDay.isDINNER_OPEN) {
-        let generatedDinnerTimes = this.generateTimeSlots(19, 0, 6, 30);
+        let generatedDinnerTimes = generateTimeSlots(19, 0, 6, 30);
         generatedDinnerTimes.forEach((time) => {
           this.dinnerTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='19:00' ? 'Bevanda Omaggio' : null});
         });
@@ -284,20 +265,6 @@ export default {
       this.completeStep(1)
       this.goToStep(2)
     },
-    getStatusClass(status) {
-      switch (status) {
-        case TimeStatus.DISPONIBLE:
-          return 'status-disponible';
-        case TimeStatus.POSTI_ESAURITI:
-          return 'status-posti-esauriti';
-        case TimeStatus.LISTA_D_ATTESA:
-          return 'status-lista-d-attesa';
-        case TimeStatus.NON_DISPONIBLE:
-          return 'status-non-disponible';
-        default:
-          return '';
-      }
-    },
     selectTime(time) {
       this.steps[2].value = time.time;
       this.completeStep(3);
@@ -306,42 +273,41 @@ export default {
     isSelectedTime(time) {
       return this.steps[2].value === time;
     },
-    isSelectedNumberOfPersons(number) {
-      return this.steps[1].value === number + ' persone';
-    },
-    selectNumberOfPersons(number) {
-      this.selectedNumberOfPeople = number;
-      if (this.selectedChildren > 0) {
-        this.steps[1].value = number + ' + ' + this.selectedChildren + ' persone';
-      } else {
-        this.steps[1].value = number + ' persone';
+    selectPeople(type,number) {
+      if(type === 'adults'){
+        this.selectedNumberOfPeople = number;
+      }else if(type === 'children'){
+        this.selectedChildren = number;
       }
-      this.completeStep(2);
-      this.goToStep(4);
-    },
-    selectNumberOfChildren(number) {
-      this.selectedChildren = number;
-    },
-    isSelectedNumberOfChildren(number) {
-      return this.selectedChildren === number;
-    },
-    updateNumberOfChildren(number) {
-      this.steps[1].value = this.selectedNumberOfPeople ? this.selectedNumberOfPeople + ' + ' + number + ' persone' : number + ' bambini';
+      if (this.selectedChildren > 0 && this.selectedNumberOfPeople > 0) {
+        this.steps[1].value = this.selectedNumberOfPeople + ' + ' + this.selectedChildren + ' persone';
+      }else if(this.selectedChildren > 0){
+        this.steps[1].value = this.selectedChildren + ' bambini';
+      }
+      else {
+        this.steps[1].value = this.selectedNumberOfPeople + ' persone';
+      }
       if (this.selectedNumberOfPeople) {
         this.completeStep(2);
         this.goToStep(4);
       }
     },
+    isSelectedNumberOfPersons(number) {
+      return this.selectedNumberOfPeople === number;
+    },
+    isSelectedNumberOfChildren(number) {
+      return this.selectedChildren === number;
+    },
     selectLocation(location) {
       this.selectedLocation = location;
+    },
+    isSelectedLocation(location) {
+      return this.selectedLocation === location;
     },
     refresh(){
       //reload the page
       this.showAlert = false;
       window.location.reload();
-    },
-    isSelectedLocation(location) {
-      return this.selectedLocation === location;
     },
     updateEnabledDays() {
       this.enabledDays = this.bookableDays.map((day) => day.date);
@@ -505,15 +471,15 @@ v-icon {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100px; /* Adjust as needed */
-  width: 100px; /* Adjust as needed */
+  height: 100px;
+  width: 100px;
   position: relative;
 }
 
 
 .time-label {
   position: absolute;
-  bottom: -20px;
+  bottom: -22px;
   text-align: center;
   padding: 2px 6px;
   font-size: 10px;
@@ -562,5 +528,14 @@ v-icon {
   max-width: 84px;
   min-width: 50px !important;
   letter-spacing: 0 !important;
+}
+.text-bottom-caption {
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+a {
+  color: #40637d !important;
 }
 </style>
