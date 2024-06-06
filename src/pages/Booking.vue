@@ -140,7 +140,7 @@
           </v-stepper-content>
           <v-stepper-content step="4">
             <!--            Content for step 4-->
-            <information-tabs-component/>
+            <customer-information-tabs-component/>
               <div  class="mx-auto text-center mt-3 " style="max-width: 300px ">
                 <div class="text-bottom-caption">Clica qui per cancellare i tuoi dati personali dal nostro database</div>
                 <a href="#" class="text-subtitle-2 my-2 text--accent-1"><v-icon left size="14px">mdi-account-outline</v-icon>CANCELLAMI</a>
@@ -155,10 +155,10 @@
 </template>
 
 <script>
-import informationTabsComponent from "../components/informationTabsComponent.vue";
 import theCalender from "../components/theCalender.vue";
 import authService from '../service/authService';
 import {TimeStatus, generateTimeSlots, getStatusClass} from "@/utils/utils";
+import CustomerInformationTabsComponent from "@/components/customerInformationTabsComponent.vue";
 
 export default {
   name: 'BookingPage',
@@ -213,7 +213,7 @@ export default {
     },
   },
   components: {
-    informationTabsComponent,
+    CustomerInformationTabsComponent,
     theCalender,
   },
   methods: {

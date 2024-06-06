@@ -1,178 +1,107 @@
 <template>
-  <v-card flat>
-    <v-tabs v-model="tab" align-tabs="start" >
-      <v-tab>Dati</v-tab>
-      <v-tab>FAQ</v-tab>
-      <v-tab>Parking</v-tab>
-      <v-tab>Naviga</v-tab>
-
-      <!-- Tab items -->
-      <v-tab-item>
-        <!-- Dati Content -->
-        <BookingComplete v-if="showBookingComplete" :type="type"/>
-        <div v-else>
-        <v-form @submit.prevent="submitForm" class="pa-1 d-flex flex-column ">
-          <div>
-          <v-row >
-            <v-col cols="3" sm="2">
-          <v-select
-            v-model="userDetails.title"
-            :items="['Mr', 'Ms', 'Mrs']"
-            label="Title"
-            required
-            hide-details="auto"
-          ></v-select>
-            </v-col>
-            <v-col>
-          <v-text-field  label="Nome " hide-details="auto" v-model="userDetails.nome" required></v-text-field>
-            </v-col>
-            <v-col>
-              <v-text-field  label="Cognome" hide-details="auto" v-model="userDetails.cognome" required></v-text-field>
-            </v-col>
-          </v-row>
-          </div>
-          <div>
-          <v-row >
-          <v-col cols="7" >
-          <v-text-field dense label="Telefono" hide-details="auto" v-model="userDetails.telefono" required></v-text-field>
-          </v-col>
-            <v-col >
-              <v-text-field dense label="CAP Rezisdenza" hide-details="auto" v-model="userDetails.cap" required></v-text-field>
-            </v-col>
-          </v-row>
-          </div>
-          <v-text-field dense label="Email" hide-details="auto" v-model="userDetails.email" required></v-text-field>
-          <v-text-field dense label="Note" hide-details="auto"  autogrow ></v-text-field>
-        </v-form>
-        <v-row class="no-gutters my-2">
-          <v-col cols="6"  >
-            <v-card flat outlined class="mr-sm-3 mr-2">
-              <v-checkbox hide-details="auto" v-for="(item,i) in extraItems" :key="i" dense class="ma-0"  v-model="item.value" :label="item.label"></v-checkbox>
-            </v-card>
-          </v-col>
-          <v-col cols="6">
-            <v-card flat outlined>
-              <v-checkbox v-for="(item,i) in specialThings" hide-details="auto" :key="i"  dense  class="ma-0"  v-model="item.value"  :label="item.label" >
-              </v-checkbox>
-              </v-card>
-          </v-col>
-        </v-row>
-        <v-checkbox hide-details="auto" v-model="subscribePromotions" label="Do you want to subscribe to our promotions?"></v-checkbox>
-        <v-row>
-          <v-col cols="12" class="text-center mt-3">
-            <v-btn color="primary" block @click="submitForm">Prenota</v-btn>
-          </v-col>
-        </v-row>
+  <v-tabs show-arrows v-model="tab" align-tabs="start" >
+    <v-tab>Info</v-tab>
+    <v-tab>Menu</v-tab>
+    <v-tab>Faq</v-tab>
+    <v-tab>Coupon</v-tab>
+    <v-tab>iBook Reviews</v-tab>
+    <v-tab>Google Reviews</v-tab>
+    <v-tab-item>
+<!--      blog links-->
+      <div class="d-flex links flex-row pa-1">
+        <v-btn x-small  color="primary">INSIDER</v-btn>
+        <v-btn x-small  outlined color="red">INSIDER</v-btn>
+        <v-btn x-small  color="primary">INSIDER</v-btn>
+        <span  class="link-text text-caption font-weight-bold">CARNE-ROMANTICO-GRUPPI</span>
+        <span class="ml-auto text-h6 align-content-start " >4.6/<span class="text-subtitle-2 align-end">5</span></span>
+      </div >
+      <div class="d-flex flex-column pa-1">
+        <div class="mb-2">
+          <v-icon dense left >mdi-map-marker</v-icon>
+          <span class="font-weight-bold text-subtitle-2">Corso Italia 32er,anglo via zara  </span>
         </div>
-      </v-tab-item>
-
-      <v-tab-item>
-        <!-- FAQ Content -->
-        <p>some frequently asked questions.</p>
-      </v-tab-item>
-
-      <v-tab-item>
-        <!-- Parking Content -->
-        <p>Information about parking.</p>
-      </v-tab-item>
-
-      <v-tab-item>
-        <!-- Navigazione Content -->
-        <p>Navigation instructions and maps.</p>
-      </v-tab-item>
-    </v-tabs>
-  </v-card>
+        <div  class="mb-2">
+          <v-icon dense left >mdi-silverware-fork-knife</v-icon>
+          <span class="font-weight-bold text-subtitle-2">Carne </span>
+        </div>
+        <div dense class="mb-2">
+          <v-icon left>mdi-cash</v-icon>
+          <span class="font-weight-bold text-subtitle-2">Prezzo Medio 40 </span>
+        </div>
+      </div>
+      <v-row class=" justify-center">
+        <v-col cols="6" sm="6">
+          <v-btn large block outlined class="flexible-btn">Website</v-btn>
+        </v-col>
+        <v-col cols="6" sm="6">
+          <v-btn large block outlined class="flexible-btn">Vai al Menu Wagyu</v-btn>
+        </v-col>
+      </v-row>
+    </v-tab-item>
+    <v-tab-item>
+      content for menu
+</v-tab-item>
+<v-tab-item>
+  content for faq
+</v-tab-item>
+<v-tab-item>
+  content for coupon
+</v-tab-item>
+<v-tab-item>
+  content for iBook Reviews
+</v-tab-item>
+<v-tab-item>
+  content for google reviews
+</v-tab-item>
+  </v-tabs>
 </template>
-
 <script>
-import BookingComplete from "@/components/bookingComplete.vue";
-import {BookingStatus} from "@/utils/utils";
-
 export default {
-  name:'informationTabsComponent',
-  components: {BookingComplete},
+  name: "informationTabsComponent",
   data() {
     return {
-      tab: null,
-      userDetails: {
-        nome: '',
-        cognome: '',
-        email: '',
-        telefono: ''
-      },
-      extraItems: {
-        senzaGluten: {
-          value: false,
-          label: 'Senza Glutine'
-        },
-        senzaLattosio: {
-          value: false,
-          label: 'Senza Lattosio'
-        },
-        vegan: {
-          value: false,
-          label: 'Cibi Vegetarini'
-        },
-        sunio: {
-          value: false,
-          label: 'No carne Sunia'
-        }
-      },
-      specialThings: {
-        birthday: {
-          value: false,
-          label: 'Portero torta '
-        },
-        pets: {
-          value: false,
-          label: 'Presenza Cane'
-        },
-        bambino:{
-          value: false,
-          label: 'Bambino in carrozina'
-        },
-        seggiolino:{
-          value: false,
-          label: 'Seggiolino'
-        }
-      },
-      subscribePromotions: false,
-      showBookingComplete: false,
-      type:BookingStatus.LISTA_D_ATTESA,
-    };
-  },
-  methods: {
-    submitForm() {
-      console.log('Form submitted');
-      console.log('User Details:', this.userDetails);
-      this.showBookingComplete = true;
+      tab:0,
     }
   }
-};
+}
 </script>
 <style scoped>
- div ::v-deep .v-slide-group__prev,.v-slide-group__prev--disabled{
-   display:none !important;
- }
- div ::v-deep .v-tab {
-   font-size: 12px !important;
-   padding : 0px 10px !important;
-   min-width: 30px !important;
- }
- div ::v-deep .v-slide-group__content{
-   justify-content: space-between;
- }
- div ::v-deep .v-messages{
+div ::v-deep .v-slide-group__prev {
+  min-width: 0 !important;
+  flex: 0 1 10px !important; ;
+}
+div ::v-deep .v-slide-group__next {
+  min-width: 0 !important;
+  flex: 0 1 10px !important; ;
+}
+div ::v-deep .v-tab {
+  font-size: 12px !important;
+  padding : 0px 10px !important;
+  min-width: 30px !important;
+}
+div ::v-deep .v-slide-group__content{
+  justify-content: space-between;
+}
+/*if it's on mobile decrease the text size */
+@media(max-width: 600px) {
+  .flexible-btn {
+    font-size: 2.7vw;
+    font-weight: 700;
+  }
+  .link-text{
+    font-size: 2vw !important;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+}
+.links{
+  gap: 4px;
+  align-items: center;
+}
+.v-icon{
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+}
 
- }
- div ::v-deep .v-input .v-label {
-   font-size: 12px !important;
- }
- .d-flex{
-   gap: 12px;
- }
- div ::v-deep .row + .row {
-    margin-top: 0px
-   /* margin-top: 12px; */
- }
 </style>
