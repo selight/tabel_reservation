@@ -1,12 +1,11 @@
-<script src="../../../tamashi-booking/demo/demo/src/main.js"></script>
 <template>
-<v-container>
-  <v-card flat max-width="600px">
+  <div class="py-1">
+    <v-divider class="mb-1"></v-divider>
     <div>
       <span class="text-h4 font-weight-bold">Tamashi Ramen</span>
     </div>
    <v-divider class="my-1"></v-divider>
-    <v-carousel hide-delimiters height="280px">
+    <v-carousel hide-delimiters cycle show-arrows-on-hover height="250px">
       <v-carousel-item
         v-for="(item,i) in carouselImages"
         :key="i"
@@ -19,9 +18,7 @@
         <v-btn color="primary" block @click="submitForm">Prenota</v-btn>
       </v-col>
     </v-row>
-
-  </v-card>
-</v-container>
+  </div>
 </template>
 <script>
 import InformationTabsComponent from "@/components/informationTabsComponent.vue";

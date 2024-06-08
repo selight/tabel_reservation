@@ -141,6 +141,22 @@ export default {
       type:BookingStatus.LISTA_D_ATTESA,
     };
   },
+  props:{
+     isBookingComplete: {
+      type: Boolean,
+    }
+  },
+  watch:{
+   isBookingComplete : {
+     immediate: true,
+     handler(value){
+        this.showBookingComplete = value;
+      }
+      },
+    showBookingComplete(value){
+      console.log('showBookingComplete:', value);
+    }
+  },
   methods: {
     submitForm() {
       console.log('Form submitted');

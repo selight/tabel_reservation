@@ -1,6 +1,5 @@
 <template>
-  <v-container>
-    <v-card flat max-width="600px">
+  <div class="py-1">
       <v-img
           height="180px"
           cover
@@ -8,10 +7,8 @@
           v-if="step!==4"
           src="../assets/tamashiBookingImage.jpg"
       ></v-img>
-
       <div class="text-center font-weight-bold  text-h5">Tamashi Ramen</div>
-      <v-divider class="my-2"></v-divider>
-
+      <v-divider class="my-1"></v-divider>
       <v-stepper v-model="step" dense>
         <v-stepper-header dense>
           <div v-for="(stepItem, index) in steps " :key="index">
@@ -35,7 +32,7 @@
         </v-stepper-header>
 
         <v-stepper-items>
-          <v-divider class="my-2"></v-divider>
+          <v-divider class="my-1"></v-divider>
           <v-alert  type="error" prominent outlined  v-show="showAlert">
             <v-row align="center">
               <v-col class="grow">
@@ -47,7 +44,7 @@
             </v-row>
 
           </v-alert>
-          <v-skeleton-loader v-if="loading" type="date-picker-day"></v-skeleton-loader>
+          <v-skeleton-loader v-if="loading" type="date-picker-days"></v-skeleton-loader>
           <v-stepper-content step="1">
             <v-row>
               <v-col cols="12">
@@ -140,7 +137,7 @@
           </v-stepper-content>
           <v-stepper-content step="4">
             <!--            Content for step 4-->
-            <customer-information-tabs-component/>
+            <customer-information-tabs-component :isBookingComplete="isBookingComplete"/>
               <div  class="mx-auto text-center mt-3 " style="max-width: 300px ">
                 <div class="text-bottom-caption">Clica qui per cancellare i tuoi dati personali dal nostro database</div>
                 <a href="#" class="text-subtitle-2 my-2 text--accent-1"><v-icon left size="14px">mdi-account-outline</v-icon>CANCELLAMI</a>
@@ -150,8 +147,7 @@
           </v-stepper-content>
         </v-stepper-items>
       </v-stepper>
-    </v-card>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -197,6 +193,7 @@ export default {
       loading: false,
       alert: 'Impossibile recuperare le date disponibili, fare clic qui per aggiornare.',
       showAlert:false,
+      isBookingComplete: null,
     };
   },
   computed:{
@@ -221,6 +218,7 @@ export default {
     goToStep(stepNumber) {
       if (this.isStepComplete(stepNumber - 1) || stepNumber === 1) {
         this.step = stepNumber;
+        this.isBookingComplete= this.step < 4 ? false : null;
       }
     },
     completeStep(stepNumber) {
@@ -246,15 +244,21 @@ export default {
       const selectedDay = this.bookableDays.find((day) => day.date === date.toLocaleDateString('it-IT'));
       if (selectedDay.isLUNCH_OPEN) {
         let generatedLunchtimes = generateTimeSlots(12, 0, 6, 30);
-        generatedLunchtimes.forEach((time) => {
-          this.lunchTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='12:00' ? 'Bevanda Omaggio' : null});
-        });
+        this.lunchTimes=[];
+        this.lunchTimes = generatedLunchtimes.map(time => ({
+          time: time,
+          status: TimeStatus.DISPONIBLE,
+          promotionText: time==='12:00' ? 'Bevanda Omaggio' : null
+        }));
       }
       if (selectedDay.isDINNER_OPEN) {
         let generatedDinnerTimes = generateTimeSlots(19, 0, 6, 30);
-        generatedDinnerTimes.forEach((time) => {
-          this.dinnerTimes.push({time: time, status: TimeStatus.DISPONIBLE, promotionText: time==='19:00' ? 'Bevanda Omaggio' : null});
-        });
+        this.dinnerTimes=[];
+        this.dinnerTimes = generatedDinnerTimes.map(time => ({
+          time: time,
+          status: TimeStatus.DISPONIBLE,
+          promotionText: time==='19:00' ? 'Bevanda Omaggio' : null
+        }));
       }
       // format the date to show the date number and month name shortened
       date = new Date(date).toLocaleDateString('it-IT', {
@@ -373,6 +377,7 @@ div ::v-deep .v-stepper__content {
     text-transform: capitalize;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-height: 13px;
   }
 }
 
@@ -537,5 +542,10 @@ v-icon {
 }
 a {
   color: #40637d !important;
+}
+.sticky-toolbar{
+  position: sticky;
+  top: 0;
+  background-color: white;
 }
 </style>
