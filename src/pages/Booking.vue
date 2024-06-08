@@ -377,12 +377,12 @@ div ::v-deep .v-stepper__content {
     text-transform: capitalize;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 13px;
   }
 }
 
 div ::v-deep .v-stepper__label {
   text-align: center !important;
+  max-height: 13px !important;
 }
 
 div ::v-deep .v-stepper__header {
