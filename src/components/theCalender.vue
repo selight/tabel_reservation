@@ -17,6 +17,7 @@
             { outside: day.outside },
             { 'disabled-day': isDisabledDay(day.date)  || isPastDay(day.date) ||!day.enabled },
             { 'selected-day': isSelectedDay(day.date)},
+            { 'no-promotion': !dateHasPromotion(day.date) }
           ]"
             @click="
             !isDisabledDay(day.date) &&
@@ -305,5 +306,8 @@ export default {
   box-shadow: rgb(0, 0, 0) 0 0 0 1px inset;
   font-weight: 500;
   background-color: rgb(238, 246, 245);
+}
+.no-promotion {
+  justify-content: center;
 }
 </style>
